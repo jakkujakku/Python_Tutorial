@@ -224,3 +224,219 @@ df = pd.read_csv(path)
 df[df['column_name'].str.contains('str')]
 ```
 
+------
+
+## 데이터프레임 집계
+
+### Groupby()
+
+- Groupie() 메소드를 이용해 데이터를 집계할 수 있습니다.
+
+```python
+df.groupby(by, as_index)['colunmName'].x
+```
+
+- by : 집계 기준 열
+
+  - List를 이용하여 여러 열을 집계 기준으로 세울 수 있습니다.
+
+- As_index : 집계 기준 인덱스(기본값: false)
+
+  - 집계기준을 인덱스로 사용할지 여부를 설정할 수 있습니다. 
+  - True로 설정시 집계 기준열의 값들이 인덱스로 설정됩니다. 
+  - False 면 정수 인덱스로 설정됩니다.
+
+- columnName : 집계할 열
+
+  - '집계 기준' 에 따라 집계할 열
+  - List 로 여러 열을 집계할 수 있습니다.
+  - 집계할 열을 하나만 작성시 series 자료형으로 반환되므로 [] 를 하나 더 작성하여 데이터프레임으로 반환하도록 권장합니다.
+  - 생략 가능하며, 생략할 시 모든 열에 대하여 집계합니다.
+
+- x : 통계 메서드들
+
+  - 범주별로 집계한 데이터들을 통계처리 할 수 있습니다.
+
+- Agg() 
+
+  - 여러 열을 다양한 각각의 통계 메소드로 집계할 수 있습니다.
+
+  ```python
+  # Example Agg()
+  pass = passes.groupby('team1', as_index = False).agg({'passes team1':'sum', 'passes completed team1':'sum'})
+  ```
+
+### Pivot_table()
+
+- Group() 메소드와 달리 집계기준을 열과 행으로 설정할 수 있습니다.
+
+```python
+df.pivot_table(index, columns, values, aggfunc)
+```
+
+- Index : 집계기준(행)
+  - 집계기준이 되는 행을 만들 수 있습니다.
+- Columns : 집계기준(열)
+  - 집계기준이 되는 열을 만들 수 있습니다.
+- Values : 집계값
+  - 집계 대상이 되는 값입니다.
+- Aggfunc : 통계값
+  - 집계 대상을 어떤 통계 방법으로 집계할지 정하는 매개변수입니다.
+
+------
+
+## 데이터프레임 시각화
+
+- pandas 에서 기본적으로 제공하는 시각화를 사용하거나 matplotlib 을 사용합니다.
+
+### plot() 
+
+```python
+df.plot(kind)
+```
+
+- kind 그릴 그래프의 종류를 지정할 수 있습니다.
+  - line
+  - bar
+  - Hist 등등
+
+### matplotlib
+
+```python
+import matplotlib.pyplot as plt
+
+# 고해상도 시각화
+%config InlineBackend.figure_format = "retina"
+```
+
+------
+
+## 데이터프레임 변경
+
+### 열 이름 변경
+
+- Rename() 메서드와 columns 속성을 이용하여 열의 이름을 변경할 수 있습니다.
+- columns 속성
+
+```python
+df.columns = ['columnName1', 'columnName2', ... ]
+```
+
+- 모든 열을 바꾸는 기능이므로 데이터프레임의 모든 열을 작성해야 하며, 변경을 원하지 않는 열은 기존의 이름을 작성하면 됩니다.
+
+- Rename() 메서드
+
+```python
+df.rename(columns = {'columnName1': 'columnName2', ... }, inplace)
+```
+
+- columnName1 : 기존 열 이름
+- columnName2 : 바꿀 열 이름
+- 반영을 위해 변수에 할당해주거나 inplace = True 로 해줍니다.
+
+### 열 추가
+
+- 기존 데이터에서 계산된 결괏값을 저장해야 할 경우에 사용됩니다.
+
+#### 오른쪽에 추가하기
+
+```python
+df['columnName'] = df['columnName1'] (operator) df['columnName2']
+```
+
+- ColumnName : 추가할 열의 이름
+- Operator : 계산을 위한 연산자 +, -, /
+
+#### 원하는 위치에 추가하기 - insert() 
+
+```python
+df.insert(indexnum, 'columnName', df['column1'] (operator) df['column2'])
+```
+
+- Indexnum : 추가할 열의 위치(int 값), 해당하는 인덱스의 앞에 열이 추가됩니다.
+
+### 행, 열 삭제
+
+- Drop() 메소드를 사용하여 삭제할 수 있습니다.
+
+```python
+df.drop(delete, axis, inplace)
+```
+
+- delete : 삭제할 행 또는 열
+  - 열 이름이 들어갈 수도 있고, 행 또는 열의 인덱스 번호가 들어갈 수도 있습니다.
+  - List 를 이용하여 한번에 여러 개를 삭제할 수 있습니다.
+- axis : 삭제할 축, 기본값 = 0
+  - 행을 삭제할지 열을 삭제할지 정해야 합니다. 0은 행을 삭제하고, 1은 열을 삭제합니다.
+- inplace : True 를 입력해 반영해주어야 합니다.
+
+### 인덱스 재설정
+
+- Set_index() 메소드를 이용하여 기존 열을 인덱스로 설정할 수 있습니다.
+
+```python
+df.set_index('col', inplace)
+```
+
+- Col : 인덱스로 설정할 열 이름
+- Inplace : True 를 입력해 반영해주어야 합니다.
+- 열 이름이 인덱스의 이름으로 적용됩니다.
+- 사용하지 않을 때에는 df.index.name = None 로 삭제해주면 됩니다.
+- Reset_index() 메소드를 이용하여 행번호에 기반한 정수값으로 인덱스를 초기화 할 수 있습니다.
+
+```python
+df.reset_index(drop)
+```
+
+- Drop : 이전 인덱스 버림 여부
+  - 인덱스를 초기화 하기 전에 기존에 있던 인덱스를 버릴지 말지 선택하는 옵션입니다.
+  - 기본값은 False 이며, 인덱스를 일반 열로 가져옵니다. 
+  - True 시 버립니다.
+  - 기존의 인덱스를 일반 열로 가져왔을 때(drop = False) 가져온 열의 이름은 index가 되니 rename() 메소드를 이용해 바꿔줍니다.
+
+#### multi index 삭제
+
+- Droplevel() 메소드를 이용하여 지울 수 있습니다.
+- 예시코드
+
+```python
+# Creating a sample MultiIndex DataFrame with multi-indexed columns
+data = {('A', 'Sub1'): [1, 2, 3, 4], ('A', 'Sub2'): [5, 6, 7, 8], ('B', 'Sub1'): [9, 10, 11, 12], ('B', 'Sub2'): [13, 14, 15, 16]}
+index = pd.Index(['Row1', 'Row2', 'Row3', 'Row4'], name='Index')
+columns = pd.MultiIndex.from_tuples([('A', 'Sub1'), ('A', 'Sub2'), ('B', 'Sub1'), ('B', 'Sub2')], names=['Category', 'Subcategory'])
+df = pd.DataFrame(data, index=index, columns=columns)
+
+print("Original DataFrame:")
+print(df)
+print("\n")
+
+# Dropping the 'Subcategory' level from the columns
+df_dropped = df.copy()
+df_dropped.columns = df_dropped.columns.droplevel('Subcategory')
+
+print("DataFrame after dropping 'Subcategory' level:")
+print(df_dropped)
+```
+
+- 결과 값(=실행 값)
+
+```python
+Original DataFrame:
+Category       A         B     
+Subcategory Sub1 Sub2 Sub1 Sub2
+Index                          
+Row1           1    5    9   13
+Row2           2    6   10   14
+Row3           3    7   11   15
+Row4           4    8   12   16
+
+
+DataFrame after dropping 'Subcategory' level:
+Category  A  A   B   B
+Index                 
+Row1      1  5   9  13
+Row2      2  6  10  14
+Row3      3  7  11  15
+Row4      4  8  12  16
+```
+
