@@ -394,7 +394,7 @@ df.reset_index(drop)
   - True 시 버립니다.
   - 기존의 인덱스를 일반 열로 가져왔을 때(drop = False) 가져온 열의 이름은 index가 되니 rename() 메소드를 이용해 바꿔줍니다.
 
-#### multi index 삭제
+### multi index 삭제
 
 - Droplevel() 메소드를 이용하여 지울 수 있습니다.
 - 예시코드
@@ -440,3 +440,266 @@ Row3      3  7  11  15
 Row4      4  8  12  16
 ```
 
+### 범주값 변경(매핑)
+
+- Map() 메서드와 replace() 메서드를 이용하면 범주형 값을 다른 값으로 바꿀 수 있습니다.
+
+```python
+df.x({ value1: value2 })
+```
+
+- x : map or replace
+- value1 : 교체 대상
+- Value2 : 교체 값
+
+- Map() : 매핑되지 못한 값들을 NaN 값으로 변경
+- Replace() : 매핑되지 못한 값들을 그대로 냅둡니다. 전체 프레임 대상으로 매핑이 가능합니다.
+
+### 범주값 만들기(데이터 이산화)
+
+- 이산화(Discretizatin) : 연속 값을 범주값으로 표현하는 과정
+- pd.cut() 와 pd.cut() 함수를 이용하여 범주값을 만들 수 있습니다.
+
+- Pd.cut() 함수
+  - 데이터의 크기를 기준으로 구간을 나누고 싶을 때 사용합니다.
+
+```python
+import pandas as pd
+pd.cut(df[column], bins. labels)
+
+# Example
+bin = [-np.inf, 2.0, 2.9, 3.5625, np.inf]
+tip['gruop'] = pd.cut(df['score'], bins = bin, labels = list('abcd'))
+```
+
+- Bins : 나눌 구간
+  - int 혹은 int 로 이루어진 list가 들어갑니다.
+  - int 를 넣은 경우 범위를 자동으로 나누어 줍니다. (최댓값 - 최솟값/n) 으로 추정합니다.
+- Labels : 범위의 이름
+  - List 로 나타냅니다.
+- Pd.qcut() 함수
+  - 갯수를 기준으로 구간을 나눌 때 사용합니다.
+  - 구간의 갯수를 지정하면 자동으로 동일한 갯수를 갖는 구간을 만들어줍니다.
+
+```python
+import pandas as pd
+pd.qcut(df[column], bins, labels)
+```
+
+- Bins : 나눌 구간의 '갯수'
+  - Int 값만 들어갈 수 있습니다.
+- 만약, bins가 4인 경우 4분위수를 기준으로 구간을 나눈 것과 같은 결과가 나옵니다. 즉, cut() 함수에서도 4분위수를 기준으로 구간을 입력하면 같은 결과를 확인할 수 있습니다.
+
+### 자료형 변경
+
+- 날짜 자료형
+  - CSV 파일에서 날짜 자료형을 가진 데이터는 object 로 읽어오게 됩니다.
+  - Pd.to_datetime() 함수를 이용하면, 날짜 자료형으로 변경할 수 있습니다.
+
+```python
+import pandas as pd
+pd.to_datetime(df['column'])
+```
+
+- 괄호 안에 자료형을 바꾸고 싶은 데이터프레임의 열을 지정하면 됩니다.
+- 날짜 자료형인 열에서 다음과 같은 메서드를 이용하면 년과 월을 추출 할 수 있습니다.
+  - .dt.year
+  - .dt.month
+  - .dt.day
+  - .dt.time
+  - .dt.date
+  - .dt.dayofweek
+
+- 다른 자료형
+  - 날짜를 제외한 다른 자료형들은 astype() 메서드를 이용하면 다른 자료형으로 변경할 수 있습니다.
+
+```python
+df['column'].astype(type)
+# or
+df.astype({'column'}; 'type')
+```
+
+- Type : 원하는 자료형
+- Syntax : Str이 들어가는 장소
+- to_numeric() 함수 : int or float 로 지정 없이 변경할 수 있습니다.
+
+### 중복값 제거하기
+
+- Value_counts() : 중복값을 집계
+- Drop_duplicates() : 집계된 데이터에서 중복값 제거
+
+```python
+df.drop_duplicates(inplace, keep, subset)
+```
+
+- Inlace : 반영여부
+  - 메소드이므로 반영하기 위해서는 True 를 해주어야 합니다.
+- Keep : 남길 데이터 (기본값 : keep = first)
+  - 중복된 데이터 중 남길 데이터를 선택할 수 있는 옵션입니다.
+  - 'first' : 첫번째 데이터를 남깁니다.
+  - 'last' : 마지막 데이터를 남깁니다.
+  - False : 다 지웁니다.
+- Subset : 삭제기준이 될 열
+  - 해당 열의 데이터가 같으면, 데이터가 제거됩니다.
+  - 열 이름을 str 로 쓰거나, 열의 index 를 작성하면 됩니다.
+  - 작성하지 않으면, 해당 행(row)의 데이터가 모두 같아야 제거됩니다.
+
+### 데이터 슬라이싱
+
+- 데이터가 object 자료형인 경우, .str.slice() 메서드를 이용하여 슬라이싱이 가능합니다.
+
+```python
+df['column'].str.slice(start, stop)
+```
+
+- Start : 슬라이싱을 시작할 인덱스, Int 값입니다.
+- Stop : 슬라이싱을 끝낼 인덱스, int 값입니다.
+- Range() 함수와 유사하게 끝나 값 -1 까지 카운트 됩니다.
+
+------
+
+## 결측치 처리하기
+
+### 결측치 확인
+
+- Into()
+  - 인덱스의 갯수와 null 이 아닌 자료형의 갯수를 알려주므로 두 값에 차이로 결측치 존재 여부와 갯수를 구할 수 있습니다.
+- Is null(), not null() 메서드 이용
+  - Is null() 메서드
+    - 결측치가 있는 데이터를 True 로 나타내며, 없는 곳은 False 로 나타냅니다.
+    - isna() 메서드도 같은 기능을 합니다.
+  - notnull() 메서드
+    - 결측치가 없는 데이터를 True 로 나타내며, 없는 곳은 False 로 나타냅니다.
+    - notna() 메서드도 같은 기능을 합니다.
+- Sum() 를 사용하면 결측치의 갯수를 구할 수 있습니다.
+
+```python
+# Example
+air.isna().sum()
+```
+
+- 결과 값
+
+```python
+Ozone      37
+Solar.R     7
+Wind        0
+Temp        0
+Month       0
+Day         0
+dtype: int64
+```
+
+### 결측치 제거
+
+- Drop() 메서드로 결측치가 있는 행이나 열을 제거할 수 있습니다.
+
+```python
+df.dropna(subset, axis, inplace)
+
+# Example, Ozone 열이 결측치인 행 제거
+air_text.dropna(subset=['Ozone'], axis=0, inplace=True)
+```
+
+- Subset : 범위
+  - 열 이름을 지정할 수 있습니다.
+  - 지정한 열의 결측치만 제거할 수 있습니다.
+  - 생략 시, 모든 데이터프레임에 대하여 결측치를 제거합니다.
+- axis : 행 또는 열
+  - 0 이면 행
+  - 1 이면 열
+- inplace : 반영 여부
+  - 데이터프레임에 변경된 결과를 적용시키려면 True 로 입력해야 합니다.
+
+### 결측치 채우기
+
+#### fillna()
+
+- 결측치를 다른 값으로 채울 수 있습니다
+
+```python
+df['column'].fillna(something, inplace)
+```
+
+- Column : 결측치를 채울 열
+- something : 조건
+  - 결측치를 어떻게 채울지 결정할 수 있는 매개변수입니다.
+  - 모든 결측치를 특정한 값으로 채워넣으려면 int 값이나 변수를 넣으면 됩니다.
+  - 특정한 값으로 채워넣는 방법은 다음과 같습니다.
+    - Method = fill : 바로 앞의 인덱스의 값으로 채우기
+    - Method = bfill : 바로 뒤의 인덱스의 값으로 채우기
+  - fillna() 메서드 대신 interpoltae() 메서드를 이용하여 선형보간법으로 결측치를 채워 넣을 수 있습니다.
+
+```python
+# Example
+air_text['Ozone'].interpolate(method = 'linear', inplace = True)
+```
+
+### 가변수 (Dummy Variable) 만들기
+
+- 가변수란?
+  - 범주형 데이터를 독립된 열로 변환한 것
+  - 가변수를 만드는 과정 => 'One-Hot-Encoding'
+  - Get_dummies() 함수를 사용해서 가변수를 만들 수 있습니다.
+
+```python
+import pandas as pd
+pd.get_dummies(df, columns, drop_first)
+```
+
+- df : 가변수를 만들 데이터프레임
+- columns : 가변수를 만들 열
+  - List 를 이용하여 한 번에 처리할 수 있습니다.
+  - 지정하지 않으면 object 값을 가지는 모든 열이 대상이 됩니다.
+  - 기존 열은 자동으로 제거되며, 열 이름은 prefix 로 지정됩니다.
+- Drop_first : 첫 열 버리기
+  - True 입력시, 첫번째 열을 버릴 수 있습니다.
+
+------
+
+## 데이터프레임 합치기
+
+### Concat(합치기)
+
+- 데이터를 물리적으로 합칠 수 있습니다.
+
+```python
+pd.concat([df1, df2], join, axis)
+```
+
+- Df : 합칠 데이터프레임
+- join : 합칠 옵션 (기본값: join = 'outer')
+  - 인덱스 혹은 열이 다른 경우 빈 값이 생기는 열 혹은 행을 결측치로 채우는 옵션이 'outer', 완전하게 제거하는 옵션이 'inner' 입니다.
+- axis : 합칠 방향 (기본값 : 0)
+  - 0 이면 세로
+  - 1 이면 가로
+
+### Join(병합)
+
+- merge() 함수를 이용하여 두 데이터프레임을 지정한 키 값 기준으로 병합할 수 있습니다.
+- 가로로만 붙일 수 있습니다.
+
+```python
+import pandas as pd
+pd.merge(df1, df2, on, how)
+```
+
+- df : 합칠 데이터프레임
+  - Concat 와 달리 list 로 묶여있지 않습니다.
+  - How 값에 따라 합치는 순서에 영향이 있습니다.
+- On : 합칠 기준이 될 키 값(열)
+  - 같은 이름의 열이 있으면 지정하지 않아도 자동으로 조인됩니다.
+  - 명시적으로 지정하는 권고됩니다.
+- How : 병합 기준 (기본값 : how = 'inner')
+  - left
+    - 왼쪽 데이터(df1)을 기준으로 병합합니다.
+    - 왼쪽에 있는 열은 결측치로 채우고 없는 열은 삭제합니다.
+  - right
+    - 오른쪽 데이터(df2)을 기준으로 병합합니다.
+    - 오른쪽에 있는 열은 결측치로 채우고 없는 열은 삭제합니다.
+  - Outer
+    - 빈 값이 생기는 모든 데이터를 결측치로 채웁니다.
+    - 합집합과 유사합니다.
+  - Inner 
+    - 빈 값이 생기는 모든 데이터의 행과 열을 삭제합니다.
+    - 교집합과 유사합니다.
